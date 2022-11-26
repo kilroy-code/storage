@@ -1,11 +1,28 @@
 {
   "name": "@kilroy-code/storage",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jasmine"
   },
-  "author": "",
-  "license": "ISC"
+  "author": {
+    "name": "Howard Stearns",
+    "email": "howard@ki1r0y.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kilroy-code/storage.git"
+  },
+  "homepage": "https://github.com/kilroy-code/storage#readme",
+  "bugs": {
+    "url": "https://github.com/kilroy-code/storage/issues"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/kilroy-code"
+  },
+  "devDependencies": {
+    "jasmine": "^4.5.0"
+  }
 }
