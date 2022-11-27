@@ -7,7 +7,7 @@ describe('Client-side In-Memory Baseline Storage', function () {
   let storage = new InMemoryStore();
   basic(storage, 'test', null, null,
         Array.from({length: 1000}, (_, index) => ({x: index})),
-        {minimumRetrievalsPerMS: 250, expectedRetrievalsPerMS: 500,
-         minimumSavesPerMS: 20, expectedSavesPerMS: 30,
+        {minimumRetrievalsPerMS: 700, expectedRetrievalsPerMS: 850,
+         minimumSavesPerMS: 20, expectedSavesPerMS: 25,
 	 ownerIsStored : false});
 });

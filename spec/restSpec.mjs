@@ -4,12 +4,25 @@ import { RestStore, fetch } from '../rest.mjs';
 import { basic, expectFailure, matchesInput } from './basic.mjs';
 import errors from '../errors.mjs';
 
+const DATASET_COUNT = 1000; // Currently at least 14, but see basic "remaining".
+
 describe('Storage REST API', function () {
   // FIXME: taglists
   // FIXME: delete? cleanup?
   // FIXME: test private properties directly?
+  class TrackingStore extends RestStore {
+    users = {'': []};
+    async storeMime(url, ...rest) {
+      const response = await super.storeMime(url, ...rest),
+	    userTag = response.userTag || '', // media
+	    users = this.users;
+      let tags = users[userTag] = users[userTag] || [];
+      tags.push(response.tag);
+      return response;
+    }
+  }
   
-  let storage = new RestStore(),
+  let storage = new TrackingStore(),
       testCredentials = {password: 'fixme'},
       alternateCredentials = {password: 'stoopid!' },
       credentialsWithFriend = {password: 'hello'},
@@ -40,6 +53,19 @@ describe('Storage REST API', function () {
     storage.setCredentials(testCredentials);
     await storage.save({collection: 'owner', payload: {name: "test 2"}});
   });
+  afterAll(async function () { // Delete all the nouns we have created during the tests.
+    let deleted = new Set();
+    for (let [userTag, tags] of Object.entries(storage.users)) {
+      for (let tag of tags) {
+	if (deleted.has(tag)) continue;
+	await storage.fetchOK(`/noun/${tag}`, {method: 'DELETE'})
+	  .catch(e => {
+	    console.error(tag, e.message, userTag);
+	  })
+	  .then(_ => deleted.add(tag));
+      }
+    }
+  }, 15e3);
 
   it('rejects retrieval if the collection does not exist.', async function () {
     let unknownCollectionName = 'unknownCollection';
@@ -51,20 +77,20 @@ describe('Storage REST API', function () {
   describe('owner endpoint', function () {
     basic(storage, 'owner', testCredentials, alternateCredentials,
           // FIXME: We can simplify everything by using testCredentials.userTag here
-          Array.from({length: 500}, (_, index) => ({someOwner: index})),
-          {minimumRetrievalsPerMS: 0.6, expectedRetrievalsPerMS: 1,
-           minimumSavesPerMS: 0.5, expectedSavesPerMS: 0.9});
+          Array.from({length: DATASET_COUNT}, (_, index) => ({someOwner: index})),
+          {minimumRetrievalsPerMS: 0.3, expectedRetrievalsPerMS: 0.6,
+           minimumSavesPerMS: 0.3, expectedSavesPerMS: 0.6});
   });
 
   describe('place endpoint', function () {
-    let payload = Array.from({length: 1000}, (_, index) => ({somePlace: index, guid: 'replace when ready'}));
+    let payload = Array.from({length: DATASET_COUNT}, (_, index) => ({somePlace: index, guid: 'replace when ready'}));
     beforeAll(async function () {
       await ready;
       payload.forEach(datum => datum.guid = IdentityMetadata.uuid());
     });
     basic(storage, 'place', testCredentials, alternateCredentials, payload,
-          {minimumRetrievalsPerMS: 0.45, expectedRetrievalsPerMS: 1,
-           minimumSavesPerMS: 0.35, expectedSavesPerMS: 0.9});
+          {minimumRetrievalsPerMS: 0.45, expectedRetrievalsPerMS: 0.6,
+           minimumSavesPerMS: 0.35, expectedSavesPerMS: 0.6});
     describe('can be restricted', function () {
       it('to just the owner.', async function () {
         let label = {collection: 'place', tag: privatePlace.tag, useCredentials: true};
@@ -97,14 +123,14 @@ describe('Storage REST API', function () {
 
   describe('thing endpoint', function () {
     // Each run must use different data (else it won't be rewritten).
-    let payloadData = Array.from({length: 1000}, (_, index) => ({someThing: index, unique: 'replace when ready'}));
+    let payloadData = Array.from({length: DATASET_COUNT}, (_, index) => ({someThing: index, unique: 'replace when ready'}));
     beforeAll(async function () { // But we need to wait for a binding for IdentityMetadata.
       await ready;
       payloadData.forEach(datum => datum.unique = IdentityMetadata.uuid());
     });
     basic(storage, 'thing', testCredentials, alternateCredentials, payloadData,
-          {minimumRetrievalsPerMS: 0.45, expectedRetrievalsPerMS: 1,
-           minimumSavesPerMS: 0.45, expectedSavesPerMS: 0.9});
+          {minimumRetrievalsPerMS: 0.3, expectedRetrievalsPerMS: 0.6,
+           minimumSavesPerMS: 0.3, expectedSavesPerMS: 0.6});
     describe('can be restricted', function () {
       it('such that only friends of the author of an authorizing composition can read.', function () {
       });
@@ -112,14 +138,14 @@ describe('Storage REST API', function () {
   });
 
   describe('media endpoint', function () {
-    let payload = Array.from({length: 1000}, (_, index) => ({someMedia: index, unique: 'replace when ready'}));
+    let payload = Array.from({length: DATASET_COUNT}, (_, index) => ({someMedia: index, unique: 'replace when ready'}));
     beforeAll(async function () {
       await ready;
       payload.forEach(datum => datum.unique = IdentityMetadata.uuid());
     });
     basic(storage, 'media', testCredentials, alternateCredentials, payload,
-          {minimumRetrievalsPerMS: 0.6, expectedRetrievalsPerMS: 1,
-           minimumSavesPerMS: 0.5, expectedSavesPerMS: 0.9,
+          {minimumRetrievalsPerMS: 0.3, expectedRetrievalsPerMS: 0.6,
+           minimumSavesPerMS: 0.3, expectedSavesPerMS: 0.6,
            ownerIsStored: false});
     describe('can be restricted', function () {
       it('such that only friends of the author of an authorizing composition can read.', function () {
