@@ -105,10 +105,12 @@ describe('Storage REST API', function () {
           .then(response => expect(response).toBeFalsy(),
                 expectFailure(errors.ForbiddenError, {status: 403, tag: testCredentials.userTag}));
       });
+      /* TODO:
       xit('such that friends can read.', async function () {
         let result = await storage.retrieve({collection: 'place', tag: friendPlace.tag, useCredentials: true});
         matchesInput(result, friendPlaceData);
       });
+      */
       it('such that non-friends cannot read.', async function () {
         expect(friendPlace.tag).toContain('!');
 	storage.setCredentials(alternateCredentials);
@@ -131,10 +133,12 @@ describe('Storage REST API', function () {
     basic(storage, 'thing', testCredentials, alternateCredentials, payloadData,
           {minimumRetrievalsPerMS: 0.3, expectedRetrievalsPerMS: 0.6,
            minimumSavesPerMS: 0.3, expectedSavesPerMS: 0.6});
+    /* TODO
     describe('can be restricted', function () {
       it('such that only friends of the author of an authorizing composition can read.', function () {
       });
     });
+    */
   });
 
   describe('media endpoint', function () {
@@ -147,10 +151,12 @@ describe('Storage REST API', function () {
           {minimumRetrievalsPerMS: 0.3, expectedRetrievalsPerMS: 0.6,
            minimumSavesPerMS: 0.3, expectedSavesPerMS: 0.6,
            ownerIsStored: false});
+    /* TODO
     describe('can be restricted', function () {
       it('such that only friends of the author of an authorizing composition can read.', function () {
       });
     });
+    */
     function media(mime, extension, blobAccessor, payloadOrPromise) {
       describe(mime, function () {
         it('can be stored yielding confirmable tag, and read as blob or mime.', async function () {
@@ -164,10 +170,12 @@ describe('Storage REST API', function () {
           expect(blobRead.type).toContain(mime);
           expect(await blobRead[blobAccessor]()).toEqual(payload);
         });
+	/* TODO:
         xit('allows XXX bytes/second while reading.', async function () {
         });
         xit('allows XXX bytes/second while writing.', async function () {
         });
+	*/
       });
     }
     media('text/plain', 'txt', 'text',

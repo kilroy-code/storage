@@ -219,10 +219,8 @@ export function basic(storage, collection, testCredentials, alternativeCredentia
             kPerSecond = payloadsLength/elapsedMS,
             warn = kPerSecond < expectedMS,
             error = kPerSecond < minimumSavesPerMS,
-            logger = error ? console.error : (warn ? console.warn : console.info),
-            message = {collection};
-        message[action] = kPerSecond;
-        logger(message);
+            logger = error ? console.error : (warn ? console.warn : console.info);
+        logger('\n', collection, kPerSecond.toFixed(1), action);
         expect(kPerSecond).toBeGreaterThan(minimumMS);
         if (warn && !error) pending(`${kPerSecond.toPrecision(1)} kPerSecond`);
       }

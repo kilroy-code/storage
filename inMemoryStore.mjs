@@ -4,7 +4,7 @@ export { MissingItemError, MissingCollectionError};
 
 export class InMemoryStore {
   constructor() {
-    this.db = {test: {}}; // FIXME: include the basic collections.
+    this.db = {test: {}, inMemory: {}}; // FIXME: include the basic collections.
     this.baseUrl = null;
   }
   setCredentials() {}
