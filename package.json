@@ -1,6 +1,6 @@
 {
   "name": "@kilroy-code/storage",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -27,11 +27,11 @@
     "registry": "https://npm.pkg.github.com"
   },
   "dependencies": {
-    "@kilroy-code/utilities": "^1.0.4",
+    "@kilroy-code/utilities": "^1.0.7",
     "uuid4": "^2.0.3"
   },
   "devDependencies": {
-    "@kilroy-code/ki1r0y": "^0.0.2",
+    "@kilroy-code/ki1r0y": "^0.0.3",
     "jasmine": "^4.5.0",
     "node-fetch": "^3.3.0"
   }
