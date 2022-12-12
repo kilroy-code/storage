@@ -1,5 +1,5 @@
 import { BaseIdentity } from './baseIdentity.mjs';
-import uuid4 from '../../javascripts/uuid4.mjs'; // A link on server to node_modules....browser.mjs
+import uuid4 from 'uuid4';
 export const ready = Promise.resolve(true);
 
 export class IdentityMetadata extends BaseIdentity {

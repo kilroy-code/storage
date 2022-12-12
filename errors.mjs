@@ -1,4 +1,4 @@
-import errors from '../utilities/errors.mjs';
+import errors from '@kilroy-code/utilities/errors.mjs';
 
 export class MissingItemError extends errors.TaggedError {
   constructor(message, {tag, kind, ...properties}) {

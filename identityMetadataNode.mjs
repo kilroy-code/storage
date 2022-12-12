@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import uuid4 from "uuid4";
+import uuid4 from 'uuid4';
 import { BaseIdentity } from './baseIdentity.mjs';
 
 export class IdentityMetadata extends BaseIdentity {

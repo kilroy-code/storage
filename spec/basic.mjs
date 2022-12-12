@@ -1,7 +1,7 @@
+import {performance} from '@kilroy-code/utilities/performance.mjs';
+import {delay} from '@kilroy-code/utilities/delay.mjs';
 import { IdentityMetadata, ready } from '../identityMetadata.mjs';
 import errors from '../errors.mjs';
-import {performance} from '../../utilities/performance.mjs';
-import {delay} from '../../utilities/delay.mjs';
 
 // Answer a function suitable for catch that checks the expected properties of the reason.
 export function expectFailure(failureClass, {kind, tag, method = 'GET', status = 404, baseUrl}) {

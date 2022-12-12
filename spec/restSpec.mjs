@@ -1,8 +1,7 @@
-
 import { IdentityMetadata, ready } from '../identityMetadata.mjs';
 import { RestStore, fetch } from '../rest.mjs';
-import { basic, expectFailure, matchesInput } from './basic.mjs';
 import errors from '../errors.mjs';
+import { basic, expectFailure, matchesInput } from './basic.mjs';
 
 const DATASET_COUNT = 1000; // Currently at least 14, but see basic "remaining".
 
