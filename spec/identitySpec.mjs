@@ -1,4 +1,4 @@
-import {IdentityMetadata, ready} from "../IdentityMetadata.mjs";
+import {IdentityMetadata, ready} from "../identityMetadata.mjs";
 
 describe('Identity storage', function () {
   beforeAll(async function () {
