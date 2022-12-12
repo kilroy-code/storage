@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jasmine"
+    "jasmine": "jasmine",
+    "test": "npm run installTestServer && npm run startTestServer && npm run jasmine && npm run stopTestServer",
+    "installTestServer": "npm explore @kilroy-code/ki1r0y -- npm install",
+    "startTestServer": "npm explore @kilroy-code/ki1r0y -- npm run background",
+    "stopTestServer": "npm explore @kilroy-code/ki1r0y -- npm stop"
   },
   "author": {
     "name": "Howard Stearns",
@@ -27,6 +31,7 @@
     "uuid4": "^2.0.3"
   },
   "devDependencies": {
+    "@kilroy-code/ki1r0y": "^0.0.2",
     "jasmine": "^4.5.0",
     "node-fetch": "^3.3.0"
   }
