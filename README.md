@@ -14,21 +14,19 @@ Storage is a protocol for a very general key-value store that can be implemented
 ### Storage Principles
 
 - Most data is immutable: 
- - cacheable at client, edge, and server
- - can be efficiently implemented by P2P systems
- - popular such data that appears in many contexts can be re-used without refetching
- - we can maximize immutability and re-useability by breaking up large assemblies of content into smaller pieces. In many cases it can be the size of an MTU.
-
+  - cacheable at client, edge, and server
+  - can be efficiently implemented by P2P systems
+  - popular such data that appears in many contexts can be re-used without refetching
+  - we can maximize immutability and re-useability by breaking up large assemblies of content into smaller pieces. In many cases it can be the size of an MTU.
 - We can maximize immutability and re-useability by treating most mutable components as simply a map of timestamps => immutable content hashes that each designate an immutable snapshot. 
- - At most, this introduces a single (typically MTU-sized) additional read or write, and often not even that. 
- - This also allows every object to have a map of past states, such that interactions are easily and efficiently undoable, which in turn allows a much freer and less intimidating user-experience.
- - The storage format is regular enough that the entire space can be traced for realtime garbage-collection, allowing unneeded past states to be easily purged.
-
+  - At most, this introduces a single (typically MTU-sized) additional read or write, and often not even that.
+  - This also allows every object to have a map of past states, such that interactions are easily and efficiently undoable, which in turn allows a much freer and less intimidating user-experience.
+  - The storage format is regular enough that the entire space can be traced for realtime garbage-collection, allowing unneeded past states to be easily purged.
 - Browser-side encryption makes things safer and simpler:
- - There's no point in relying on server-enforced access control lists if hackers break into the server, and multi-party distributed storage cannot count on such enforcement. It is much better to encrypt in the browser, transmit and store the encrypted data in the cloud, and decrypt in the browser. Since the server is then not doing any acccess control for read, a wide variety of caching and storage techniques can then be used.
- - Browser-signed data allows everything to be attributed at the fine-grain size of the data.
- - Writing data is also efficient. There is no need for access control on never-yet-seen data - which is most data because most is immutable and thus not re-written. For mutable data, safe rewriting is handled efficiently by checking the signature, requiring at most one efficient data-read by the server.
- - Storage and Distributed Security form a co-dependency, such that each depends on the other.
+  - There's no point in relying on server-enforced access control lists if hackers break into the server, and multi-party distributed storage cannot count on such enforcement. It is much better to encrypt in the browser, transmit and store the encrypted data in the cloud, and decrypt in the browser. Since the server is then not doing any acccess control for read, a wide variety of caching and storage techniques can then be used.
+  - Browser-signed data allows everything to be attributed at the fine-grain size of the data.
+  - Writing data is also efficient. There is no need for access control on never-yet-seen data - which is most data because most is immutable and thus not re-written. For mutable data, safe rewriting is handled efficiently by checking the signature, requiring at most one efficient data-read by the server.
+  - Storage and Distributed Security form a co-dependency, such that each depends on the other.
 
 
 
