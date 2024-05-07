@@ -2,8 +2,9 @@ import errors from './errors.mjs';
 import { IdentityMetadata, ready } from './identityMetadata.mjs';
 export const btoa = (typeof window !== 'undefined') ? window.btoa : function btoa(string) { return Buffer.from(string, 'binary').toString('base64'); };
 export { ready };
+const loc = typeof(window) === 'undefined' ? "http://localhost:3000" : window.location.href;
 export function xfetch(resource, options) {
-  if (!resource.startsWith('http')) resource = "http://localhost:3000" + resource;
+  if (!resource.startsWith('http')) resource = loc + resource;
   return fetch(resource, options);
 };
 
