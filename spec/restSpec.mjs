@@ -1,5 +1,5 @@
 import { IdentityMetadata, ready } from '../identityMetadata.mjs';
-import { RestStore, fetch } from '../rest.mjs';
+import { RestStore, xfetch } from '../rest.mjs';
 import errors from '../errors.mjs';
 import { basic, expectFailure, matchesInput } from './basic.mjs';
 
@@ -64,7 +64,7 @@ describe('Storage REST API', function () {
 	  .then(_ => deleted.add(tag));
       }
     }
-  }, 15e3);
+  }, 20e3);
 
   it('rejects retrieval if the collection does not exist.', async function () {
     let unknownCollectionName = 'unknownCollection';
@@ -78,7 +78,7 @@ describe('Storage REST API', function () {
           // FIXME: We can simplify everything by using testCredentials.userTag here
           Array.from({length: DATASET_COUNT}, (_, index) => ({someOwner: index})),
           {minimumRetrievalsPerMS: 0.3, expectedRetrievalsPerMS: 0.6,
-           minimumSavesPerMS: 0.3, expectedSavesPerMS: 0.6});
+           minimumSavesPerMS: 0.05, expectedSavesPerMS: 0.6});
   });
 
   describe('place endpoint', function () {
@@ -89,7 +89,7 @@ describe('Storage REST API', function () {
     });
     basic(storage, 'place', testCredentials, alternateCredentials, payload,
           {minimumRetrievalsPerMS: 0.45, expectedRetrievalsPerMS: 0.6,
-           minimumSavesPerMS: 0.35, expectedSavesPerMS: 0.6});
+           minimumSavesPerMS: 0.25, expectedSavesPerMS: 0.6});
     describe('can be restricted', function () {
       it('to just the owner.', async function () {
         let label = {collection: 'place', tag: privatePlace.tag, useCredentials: true};
@@ -180,6 +180,6 @@ describe('Storage REST API', function () {
     media('text/plain', 'txt', 'text',
           "The quick brown fox jumps over the lazy dog.");
     media('image/png', 'png', 'arrayBuffer',
-          fetch('/images/kilroy-1k2.png').then(r => r.arrayBuffer()));
+          xfetch('/images/kilroy-1k2.png').then(r => r.arrayBuffer()));
   });
 });

@@ -1,14 +1,12 @@
 import errors from './errors.mjs';
 import { IdentityMetadata, ready } from './identityMetadata.mjs';
-export const fetch = (typeof window !== 'undefined') ? window.fetch : await import('node-fetch').then(exports => {
-  let xfetch = exports.default;
-  return function fetch(resource, options) {
-    if (!resource.startsWith('http')) resource = "http://localhost:3000" + resource;
-    return xfetch(resource, options);
-  };
-});
 export const btoa = (typeof window !== 'undefined') ? window.btoa : function btoa(string) { return Buffer.from(string, 'binary').toString('base64'); };
 export { ready };
+export function xfetch(resource, options) {
+  if (!resource.startsWith('http')) resource = "http://localhost:3000" + resource;
+  return fetch(resource, options);
+};
+
 
 // Design question: Should payload in to save, and combinedData out from retrieve, include tag?
 // Certainly it is redundant:
@@ -75,7 +73,7 @@ export class RestStore {
       // for each request, so there's no point in optimizing that yet.
       options.headers.Authorization = 'Basic ' + btoa(this.userTag + ':' + this.password);
     }
-    let response = await fetch(url, options);
+    let response = await xfetch(url, options);
     if (response.ok) return response;
     let errorData = {},
         contentType = response.headers.get('Content-Type');

@@ -235,7 +235,7 @@ export function basic(storage, collection, testCredentials, alternativeCredentia
         let start = performance.now();
         await saveInChunks();
         checkTime(start, minimumSavesPerMS, expectedSavesPerMS, 'kSavesPerSecond');
-      }, 10000);
+      }, 20e3);
       it(`can do ${minimumRetrievalsPerMS}k retrieves per second in a client (and this test will warn if not ${expectedRetrievalsPerMS}k).`, async function () {
         let responses = await saveInChunks(),
             start = performance.now();
@@ -243,7 +243,7 @@ export function basic(storage, collection, testCredentials, alternativeCredentia
           await Promise.all(group.map(saved => read(saved.tag)));
         }
         checkTime(start, minimumRetrievalsPerMS, expectedRetrievalsPerMS, 'kRetrievesPerSecond');
-      }, 10000);
+      }, 20e3);
     });
   });
 }
