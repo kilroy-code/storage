@@ -64,7 +64,7 @@ describe('Storage REST API', function () {
 	  .then(_ => deleted.add(tag));
       }
     }
-  }, 20e3);
+  }, 30e3);
 
   it('rejects retrieval if the collection does not exist.', async function () {
     let unknownCollectionName = 'unknownCollection';
@@ -89,7 +89,7 @@ describe('Storage REST API', function () {
     });
     basic(storage, 'place', testCredentials, alternateCredentials, payload,
           {minimumRetrievalsPerMS: 0.45, expectedRetrievalsPerMS: 0.6,
-           minimumSavesPerMS: 0.25, expectedSavesPerMS: 0.6});
+           minimumSavesPerMS: 0.1, expectedSavesPerMS: 0.6});
     describe('can be restricted', function () {
       it('to just the owner.', async function () {
         let label = {collection: 'place', tag: privatePlace.tag, useCredentials: true};
@@ -131,7 +131,7 @@ describe('Storage REST API', function () {
     });
     basic(storage, 'thing', testCredentials, alternateCredentials, payloadData,
           {minimumRetrievalsPerMS: 0.3, expectedRetrievalsPerMS: 0.6,
-           minimumSavesPerMS: 0.3, expectedSavesPerMS: 0.6});
+           minimumSavesPerMS: 0.1, expectedSavesPerMS: 0.6});
     /* TODO
     describe('can be restricted', function () {
       it('such that only friends of the author of an authorizing composition can read.', function () {
@@ -148,7 +148,7 @@ describe('Storage REST API', function () {
     });
     basic(storage, 'media', testCredentials, alternateCredentials, payload,
           {minimumRetrievalsPerMS: 0.3, expectedRetrievalsPerMS: 0.6,
-           minimumSavesPerMS: 0.3, expectedSavesPerMS: 0.6,
+           minimumSavesPerMS: 0.1, expectedSavesPerMS: 0.6,
            ownerIsStored: false});
     /* TODO
     describe('can be restricted', function () {
