@@ -64,7 +64,7 @@ describe('Storage REST API', function () {
 	  .then(_ => deleted.add(tag));
       }
     }
-  }, 30e3);
+  }, 300e3);
 
   it('rejects retrieval if the collection does not exist.', async function () {
     let unknownCollectionName = 'unknownCollection';

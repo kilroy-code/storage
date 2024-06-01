@@ -1,6 +1,6 @@
 {
   "name": "@kilroy-code/storage",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -31,7 +31,7 @@
     "uuid4": "^2.0.3"
   },
   "devDependencies": {
-    "@kilroy-code/ki1r0y": "^0.0.5",
+    "@kilroy-code/ki1r0y": "^0.0.12",
     "jasmine": "^4.5.0"
   }
 }
