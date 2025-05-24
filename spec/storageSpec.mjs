@@ -43,7 +43,9 @@ describe("ResponseCache", function () {
     } 
     beforeAll(async function () {
       cache.debug = debug;
-      console.log(label, 'previous data:', await get1(sticky));
+      const note = document.createElement('p');
+      note.innerText = `${label} previously stored data: ${await get1(sticky)}.`;
+      document.body.append(note);
       await opMaker('put', item+'initial', initialData);
     });
     afterAll(async function () {
