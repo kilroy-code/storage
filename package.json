@@ -1,0 +1,33 @@
+{
+  "name": "@kilroy-code/storage",
+  "version": "0.0.1",
+  "description": "Key-value store for Web pages & PWAs, and their Express.js server.",
+  "main": "index.mjs",
+  "scripts": {
+    "test": "jasmine"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kilroy-code/storage.git"
+  },
+  "keywords": [
+    "key-value",
+    "storage",
+    "Cache",
+    "Web",
+    "browser",
+    "NodeJS",
+    "PWA",
+    "Express.js",
+    "routes"
+  ],
+  "author": "howard@ki1r0y.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kilroy-code/storage/issues"
+  },
+  "homepage": "https://github.com/kilroy-code/storage#readme",
+  "devDependencies": {
+    "jasmine": "^5.7.1"
+  }
+}
