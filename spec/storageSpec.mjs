@@ -1,6 +1,12 @@
 const { describe, it, expect, beforeAll, afterAll, jasmine, Request, Response } = globalThis; // Put here anything not defined by your linter.
 import { ResponseCache, FetchAPI } from '@kilroy-code/storage';
 
+function note(text) {
+  const note = document.createElement('p');
+  note.innerText = text;
+  document.body.append(note);
+}
+
 describe("ResponseCache", function () {
   const cache = new ResponseCache('immediate');
   const fetcher = new FetchAPI('worker');  
@@ -9,6 +15,16 @@ describe("ResponseCache", function () {
   const initialData = "Initial data";
   const sticky = item+'sticky';
   beforeAll(async function () {
+    const persist = await navigator.storage.persist();
+    note(`location = "${location.href}"`);
+    note(`Storage ${persist ? 'is' : 'is not'} separate from browser-clearing.`);
+
+    const outerStorage = await caches.open("auth"); // Not within service worker.
+    const initialOuterStorage = await outerStorage.match(location.href, {ignoreSearch: true }).then(response => response && response.json());
+    await outerStorage.put(location.href, Response.json(location.href));
+    const laterOuterStorage = await outerStorage.match(location.href, {ignoreSearch: true }).then(response => response && response.json());
+    note(`Initial non-service-worker cache value: "${initialOuterStorage}", updated to: "${laterOuterStorage}".`);
+
     const registration = await navigator.serviceWorker.register('/fairshare/serviceWorkerCache.mjs', {
       type: 'module',
       scope: '/fairshare/'
@@ -43,9 +59,7 @@ describe("ResponseCache", function () {
     } 
     beforeAll(async function () {
       cache.debug = debug;
-      const note = document.createElement('p');
-      note.innerText = `${label} previously stored data: ${await get1(sticky)}.`;
-      document.body.append(note);
+      note(`${label} previously stored data: ${await get1(sticky)}.`);
       await opMaker('put', item+'initial', initialData);
     });
     afterAll(async function () {
