@@ -25,6 +25,12 @@ describe("ResponseCache", function () {
     const laterOuterStorage = await outerStorage.match(location.href, {ignoreSearch: true }).then(response => response && response.json());
     note(`Initial non-service-worker cache value: "${initialOuterStorage}", updated to: "${laterOuterStorage}".`);
 
+    // Delayed addition of manifest.
+    const manifest = document.createElement('link');
+    manifest.setAttribute('rel', 'manifest');
+    manifest.setAttribute('href', new URL('manifest-test.json', location.href).href);
+    document.head.append(manifest);
+
     const registration = await navigator.serviceWorker.register('/fairshare/serviceWorkerCache.mjs', {
       type: 'module',
       scope: '/fairshare/'
