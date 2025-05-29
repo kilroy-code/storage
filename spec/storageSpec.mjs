@@ -48,46 +48,31 @@ describe("ResponseCache", function () {
     }
   });
   function testOperations(label, opMaker, debug = false) {
-    async function listing() { // Convert a Response to an array of requests if necessary.
-      const answer = await opMaker('list', collection);
-      if (Array.isArray(answer)) return answer;
-      return await answer.json();
-    }
-    async function get1(url) { // get a value, and convert the Response if necessary.
-      const answer = await opMaker('get', url);
-      if (answer instanceof Response) return await answer.json();
-      return answer;
-    }
-    async function delete1(url) { // delete a value, and convert the Response if ncessary.
-      const answer = await opMaker('delete', url);
-      if (answer instanceof Response) return await answer.json();
-      return answer;
-    } 
     beforeAll(async function () {
       cache.debug = debug;
-      note(`${label} previously stored data: ${await get1(sticky)}.`);
+      note(`${label} previously stored data: ${await opMaker('get', sticky)}.`);
       await opMaker('put', item+'initial', initialData);
     });
     afterAll(async function () {
       cache.debug = false;
-      let list = await listing();
-      await Promise.all(list.map(request => false || delete1(request)));
-      const after = await listing();
+      let list = await opMaker('list', collection);
+      await Promise.all(list.map(request => false || opMaker('delete', request)));
+      const after = await opMaker('list', collection);
       expect(after).toEqual([]);
       await opMaker('put', sticky, ResponseCache.version);
     });
     it("gets what is put there.", async function () {
-      const response = await get1(item+'initial');
+      const response = await opMaker('get', item+'initial');
       expect(response).toBe(initialData);
     });
     it("promises undefined for what is not there.", async function () {
-      expect(!!(await get1(item+"something not yet put there"))).toBeFalsy();
+      expect(!!(await opMaker('get', item+"something not yet put there"))).toBeFalsy();
     });
     it("lists what is put there.", async function () {
-      const list = await listing();
+      const list = await opMaker('list', collection);
       const initialRequest = list.find(request => (request.url || request).includes('initial'));
       expect(initialRequest).toBeTruthy();
-      const response = await get1(initialRequest);
+      const response = await opMaker('get', initialRequest);
       expect(response).toBe(initialData);
     });
     it("can put responses.", async function() {
@@ -95,7 +80,7 @@ describe("ResponseCache", function () {
       const url = item+name;
       const body = "foo bar "+name;
       await opMaker('put', url, body);
-      const answer = await get1(url);
+      const answer = await opMaker('get', url);
       expect(answer).toBe(body);
     });
     it("can delete.", async function () {
@@ -103,12 +88,12 @@ describe("ResponseCache", function () {
       const url = item+name;
       const body = "something "+name;
       await opMaker('put', url, body);
-      const answer = await get1(url);
+      const answer = await opMaker('get', url);
       expect(answer).toBe(body);
 
-      expect(await delete1(url)).toBeTruthy();
-      expect(!!(await get1(url))).toBeFalsy();
-      expect(await delete1(url)).toBeFalsy();    
+      expect(await opMaker('delete', url)).toBeTruthy();
+      expect(!!(await opMaker('get', url))).toBeFalsy();
+      expect(await opMaker('delete', url)).toBeFalsy();
     });
   }
   describe('with string url request', function () {
@@ -118,12 +103,12 @@ describe("ResponseCache", function () {
     testOperations('dispatch', async (op, url, data) => {
       const options = {method: (op === 'list') ? 'GET' : op.toUpperCase()};
       if (data) options.body = JSON.stringify(data);
-      return cache.dispatch(new Request(url, options));
+      const response = await cache.dispatch(new Request(url, options));
+      return response.json();
     });
   });
   describe('by fetch api', function () {
     function ensureStorage(url) {
-      if (url.startsWith('/storage')) return url;
       return '/storage' + url;
     }
     testOperations('service worker', (op, url, data) => fetcher[op](ensureStorage(url), data));
