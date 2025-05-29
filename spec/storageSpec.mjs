@@ -8,8 +8,8 @@ function note(text) {
 }
 
 describe("ResponseCache", function () {
-  const cache = new ResponseCache({name: 'immediate'});
-  const fetcher = new FetchAPI({name: 'worker'});
+  const cache = new ResponseCache({name: 'storage'});
+  const fetcher = new FetchAPI({name: 'storage'});
   const collection = '/directItems/';
   const item = collection+'?tag=';
   const initialData = "Initial data";
@@ -97,20 +97,17 @@ describe("ResponseCache", function () {
     });
   }
   describe('with string url request', function () {
-    testOperations('string', (op, url, data) => cache[op](url, data));
+    testOperations('string', (op, tag, data) => cache[op](tag, data));
   });
   describe('by dispatch', function () {
-    testOperations('dispatch', async (op, url, data) => {
+    testOperations('dispatch', async (op, tag, data) => {
       const options = {method: (op === 'list') ? 'GET' : op.toUpperCase()};
       if (data) options.body = JSON.stringify(data);
-      const response = await cache.dispatch(new Request(url, options));
+      const response = await cache.dispatch(new Request(tag, options));
       return response.json();
     });
   });
   describe('by fetch api', function () {
-    function ensureStorage(url) {
-      return '/storage' + url;
-    }
-    testOperations('service worker', (op, url, data) => fetcher[op](ensureStorage(url), data));
+    testOperations('service worker', (op, tag, data) => fetcher[op](tag, data));
   });
 });
