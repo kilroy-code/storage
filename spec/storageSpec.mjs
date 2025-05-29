@@ -25,27 +25,13 @@ describe("ResponseCache", function () {
     const laterOuterStorage = await outerStorage.match(location.href, {ignoreSearch: true }).then(response => response && response.json());
     note(`Initial non-service-worker cache value: "${initialOuterStorage}", updated to: "${laterOuterStorage}".`);
 
+    await fetcher.ready;
+
     // Delayed addition of manifest.
     const manifest = document.createElement('link');
     manifest.setAttribute('rel', 'manifest');
     manifest.setAttribute('href', new URL('manifest-test.json', location.href).href);
     document.head.append(manifest);
-
-    const registration = await navigator.serviceWorker.register('/fairshare/serviceWorkerCache.mjs', {
-      type: 'module',
-      scope: '/fairshare/'
-    });
-    if (registration.installing) {
-      console.log(`Service worker installing for scope ${registration.scope}.`);
-    } else if (registration.waiting) {
-      console.log(`Service worker installed for scope ${registration.scope}.`);
-    } else if (registration.active) {
-      console.log(`Service worker active for scope ${registration.scope}.`);
-    }
-    await navigator.serviceWorker.ready; // But I find that's often a lie, so check.
-    if (navigator.serviceWorker.controller === null) { // Can happen from random timing at install, or from shift-reload (which turns off the Cache!).
-      registration.active.postMessage("claim again");  // Explicitly tell service worker to clients.claim() again.
-    }
   });
   function testOperations(label, opMaker, debug = false) {
     beforeAll(async function () {
