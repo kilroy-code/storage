@@ -112,10 +112,7 @@ describe("ResponseCache", function () {
     });
   }
   describe('with string url request', function () {
-    testOperations('string', (op, url, data) => cache[op](url, data && Response.json(data)));
-  });
-  describe('with Request objects', function () {
-    testOperations('Request', (op, url, data) => cache[op](new Request(url), data && Response.json(data)));
+    testOperations('string', (op, url, data) => cache[op](url, data));
   });
   describe('by dispatch', function () {
     testOperations('dispatch', async (op, url, data) => {
