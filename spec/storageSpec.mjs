@@ -1,4 +1,4 @@
-const { describe, it, expect, beforeAll, afterAll, jasmine, Request, Response } = globalThis; // Put here anything not defined by your linter.
+const { describe, it, expect, beforeAll, afterAll, jasmine, Request, Response, URL } = globalThis; // Put here anything not defined by your linter.
 import { ResponseCache, FetchAPI } from '@kilroy-code/storage';
 
 function note(text) {
@@ -25,7 +25,14 @@ describe("ResponseCache", function () {
     const laterOuterStorage = await outerStorage.match(location.href, {ignoreSearch: true }).then(response => response && response.json());
     note(`Initial non-service-worker cache value: "${initialOuterStorage}", updated to: "${laterOuterStorage}".`);
 
-    await fetcher.ready;
+    const registration = await fetcher.ready;
+    if (registration.installing) {
+      console.log(`Service worker installing for scope ${registration.scope}.`);
+    } else if (registration.waiting) {
+      console.log(`Service worker installed for scope ${registration.scope}.`);
+    } else if (registration.active) {
+      console.log(`Service worker active for scope ${registration.scope}.`);
+    }
 
     // Delayed addition of manifest.
     const manifest = document.createElement('link');
