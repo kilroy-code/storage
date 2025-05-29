@@ -111,19 +111,19 @@ describe("ResponseCache", function () {
       expect(await delete1(url)).toBeFalsy();    
     });
   }
-  // describe('with string url request', function () {
-  //   testOperations('string', (op, url, data) => cache[op](url, data && Response.json(data)));
-  // });
-  // describe('with Request objects', function () {
-  //   testOperations('Request', (op, url, data) => cache[op](new Request(url), data && Response.json(data)));
-  // });
-  // describe('by dispatch', function () {
-  //   testOperations('dispatch', async (op, url, data) => {
-  //     const options = {method: (op === 'list') ? 'GET' : op.toUpperCase()};
-  //     if (data) options.body = JSON.stringify(data);
-  //     return cache.dispatch(new Request(url, options));
-  //   });
-  // });
+  describe('with string url request', function () {
+    testOperations('string', (op, url, data) => cache[op](url, data && Response.json(data)));
+  });
+  describe('with Request objects', function () {
+    testOperations('Request', (op, url, data) => cache[op](new Request(url), data && Response.json(data)));
+  });
+  describe('by dispatch', function () {
+    testOperations('dispatch', async (op, url, data) => {
+      const options = {method: (op === 'list') ? 'GET' : op.toUpperCase()};
+      if (data) options.body = JSON.stringify(data);
+      return cache.dispatch(new Request(url, options));
+    });
+  });
   describe('by fetch api', function () {
     function ensureStorage(url) {
       if (url.startsWith('/storage')) return url;
