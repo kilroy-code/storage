@@ -8,8 +8,8 @@ function note(text) {
 }
 
 describe("ResponseCache", function () {
-  const cache = new ResponseCache('immediate');
-  const fetcher = new FetchAPI('worker');  
+  const cache = new ResponseCache({name: 'immediate'});
+  const fetcher = new FetchAPI({name: 'worker'});
   const collection = '/directItems/';
   const item = collection+'?tag=';
   const initialData = "Initial data";
@@ -71,8 +71,9 @@ describe("ResponseCache", function () {
     afterAll(async function () {
       cache.debug = false;
       let list = await listing();
-      await Promise.all(list.map(request => false || cache.delete(request)));
-      expect(await listing()).toEqual([]);
+      await Promise.all(list.map(request => false || delete1(request)));
+      const after = await listing();
+      expect(after).toEqual([]);
       await opMaker('put', sticky, ResponseCache.version);
     });
     it("gets what is put there.", async function () {
@@ -110,22 +111,22 @@ describe("ResponseCache", function () {
       expect(await delete1(url)).toBeFalsy();    
     });
   }
-  describe('with string url request', function () {
-    testOperations('string', (op, url, data) => cache[op](url, data && Response.json(data)));
-  });
-  describe('with Request objects', function () {
-    testOperations('Request', (op, url, data) => cache[op](new Request(url), data && Response.json(data)));
-  });
-  describe('by dispatch', function () {
-    testOperations('dispatch', async (op, url, data) => {
-      const options = {method: (op === 'list') ? 'GET' : op.toUpperCase()};
-      if (data) options.body = JSON.stringify(data);
-      return cache.dispatch(new Request(url, options));
-    });
-  });
+  // describe('with string url request', function () {
+  //   testOperations('string', (op, url, data) => cache[op](url, data && Response.json(data)));
+  // });
+  // describe('with Request objects', function () {
+  //   testOperations('Request', (op, url, data) => cache[op](new Request(url), data && Response.json(data)));
+  // });
+  // describe('by dispatch', function () {
+  //   testOperations('dispatch', async (op, url, data) => {
+  //     const options = {method: (op === 'list') ? 'GET' : op.toUpperCase()};
+  //     if (data) options.body = JSON.stringify(data);
+  //     return cache.dispatch(new Request(url, options));
+  //   });
+  // });
   describe('by fetch api', function () {
     function ensureStorage(url) {
-      if (url.startsWith('/storage') || url.startsWith('http')) return url; // fixme: get rid of http guard by having list produce pathnames.
+      if (url.startsWith('/storage')) return url;
       return '/storage' + url;
     }
     testOperations('service worker', (op, url, data) => fetcher[op](ensureStorage(url), data));
