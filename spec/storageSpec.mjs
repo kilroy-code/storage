@@ -9,7 +9,7 @@ function note(text) {
 
 describe("ResponseCache", function () {
   const cache = new ResponseCache({name: 'storage'});
-  const fetcher = new FetchAPI({name: 'storage'});
+  let fetcher = new FetchAPI({name: 'storage'});;
   const collection = '/directItems/';
   const item = collection+'?tag=';
   const initialData = "Initial data";
@@ -43,7 +43,7 @@ describe("ResponseCache", function () {
   function testOperations(label, opMaker, debug = false) {
     beforeAll(async function () {
       cache.debug = debug;
-      note(`${label} previously stored data: ${await opMaker('get', sticky)}.`);
+      //note(`${label} previously stored data: ${await opMaker('get', sticky)}.`);
       await opMaker('put', item+'initial', initialData);
     });
     afterAll(async function () {
