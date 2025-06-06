@@ -1,6 +1,6 @@
 const { describe, it, expect, beforeAll, afterAll, jasmine, Request, Response, URL } = globalThis; // Put here anything not defined by your linter.
 import uuid4 from 'uuid4';
-import { StorageLocal } from '@kilroy-code/storage';
+import StorageLocal from '@ki1r0y/storage';
 
 describe("Storage", function () {
   const storage = new StorageLocal({name: 'test-storage'});

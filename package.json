@@ -1,7 +1,7 @@
 {
-  "name": "@kilroy-code/storage",
-  "version": "0.0.11",
-  "description": "Key-value store for Web pages & PWAs, and their Express.js server.",
+  "name": "@ki1r0y/storage",
+  "version": "1.0.1",
+  "description": "Key-value store for Web pages & PWAs.",
   "exports": "./index.mjs",
   "imports": {
     "#storage-local": {
@@ -18,6 +18,9 @@
     "type": "git",
     "url": "git+https://github.com/kilroy-code/storage.git"
   },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
   "keywords": [
     "key-value",
     "storage",
@@ -25,9 +28,7 @@
     "Web",
     "browser",
     "NodeJS",
-    "PWA",
-    "Express.js",
-    "routes"
+    "PWA"
   ],
   "author": "howard@ki1r0y.com",
   "license": "MIT",
