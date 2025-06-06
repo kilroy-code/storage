@@ -52,8 +52,45 @@ describe("Storage", function () {
       expect(!!(await opMaker('get', tag))).toBeFalsy();
       expect(await opMaker('delete', tag)).toBeFalsy();
     });
+    describe("types", function () {
+      function checkType(label, value, comparator = 'toBe') {
+	it(`stores ${label}.`, async function () {
+	  const tag = 'type';
+	  await opMaker('put', tag, value);
+	  expect(await opMaker('get', tag))[comparator](value);
+	  await opMaker('delete', tag);
+	});
+      }
+      checkType('true', true);
+      checkType('false', false);
+      checkType('null', null);
+      checkType('integer', 17);
+      checkType('float', Math.PI);
+      checkType('string', "this is a string");
+      checkType('array', [true, false, null, 17, Math.PI, "this is a string", ['foo'], {red: 'green'}], 'toEqual');
+      checkType('object', {red: 'green', blue: 17, yellow: ["hi there"]}, 'toEqual');
+    });
+    it('access to the same tag is serialized.', async function () {
+      let tag = 'serialized';
+      let n = 4;
+      storage.debug = true;
+      let results = await Promise.all(Array.from({length: n * 2}, async (_, i) => {
+	if (i % 2) {
+	  const got = await opMaker('get', tag);
+	  return got;
+	}
+	const storing = i / 2;
+	const ignore = await opMaker('put', tag, storing);
+	return null;
+      }));
+      for (let i = 0; i < n; i++) {
+	const result = results[2 * i + 1];
+	expect(result).toBe(i);
+      }
+      storage.debug = false;
+    });
   }
-  describe('with string tag request', function () {
+  describe('with string tags', function () {
     testOperations('string', (op, tag, data) => storage[op](tag, data));
   });
   describe('performance', function () {
