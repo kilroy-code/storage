@@ -1,5 +1,24 @@
 const { describe, it, expect, beforeAll, afterAll, jasmine, Request, Response, URL } = globalThis; // Put here anything not defined by your linter.
-import { ResponseCache, FetchAPI } from '@kilroy-code/storage';
+import uuid4 from 'uuid4';
+//import { ResponseCache, FetchAPI } from '@kilroy-code/storage';
+//import { PersistIndexedDB } from '../../flexstore/lib/persist-indexeddb.mjs';
+//import { StorageFS } from '../lib/storage-fs.mjs';
+import { StorageLocal } from '@kilroy-code/storage';
+
+class NothingDictionary {
+  storage = {};
+  get(k) { const v = this.storage[k]; return v === undefined ? v : JSON.parse(v); }
+  delete(k) { delete this.storage[k]; }
+  put(k, v) { this.storage[k] = JSON.stringify(v); }
+  list() { return Object.keys(this.storage); }
+}
+class NothingMap {
+  storage = new Map();
+  get(k) { const v = this.storage.get(k); return v === undefined ? v : JSON.parse(v); }
+  delete(k) { this.storage.delete(k); }
+  put(k, v) { this.storage.set(k, JSON.stringify(v)); }
+  list() { return Array.from(this.storage.keys()); }
+}
 
 function note(text) {
   const note = document.createElement('p');
@@ -8,37 +27,31 @@ function note(text) {
 }
 
 describe("ResponseCache", function () {
-  const cache = new ResponseCache({name: 'storage'});
-  let fetcher = new FetchAPI({name: 'storage'});;
-  const collection = '/directItems/';
-  const item = collection+'?tag=';
+  //const cache = new ResponseCache({name: 'storage'});
+  //const  cache = new StorageFS({name: 'storage'});
+  const cache = new StorageLocal({name: 'storage'});
+  //const cache = new PersistIndexedDB({collectionLabel: 'storage'});
+  //const cache = new NothingDictionary();
+  const collection = '';
+  const item = collection+'';
   const initialData = "Initial data";
   const sticky = item+'sticky';
   beforeAll(async function () {
-    const persist = await navigator.storage.persist();
-    note(`location = "${location.href}"`);
-    note(`Storage ${persist ? 'is' : 'is not'} separate from browser-clearing.`);
+    // const persist = await navigator.storage.persist();
+    // note(`location = "${location.href}"`);
+    // note(`Storage ${persist ? 'is' : 'is not'} separate from browser-clearing.`);
 
-    const outerStorage = await caches.open("auth"); // Not within service worker.
-    const initialOuterStorage = await outerStorage.match(location.href, {ignoreSearch: true }).then(response => response && response.json());
-    await outerStorage.put(location.href, Response.json(location.href));
-    const laterOuterStorage = await outerStorage.match(location.href, {ignoreSearch: true }).then(response => response && response.json());
-    note(`Initial non-service-worker cache value: "${initialOuterStorage}", updated to: "${laterOuterStorage}".`);
+    // const outerStorage = await caches.open("auth"); // Not within service worker.
+    // const initialOuterStorage = await outerStorage.match(location.href, {ignoreSearch: true }).then(response => response && response.json());
+    // await outerStorage.put(location.href, Response.json(location.href));
+    // const laterOuterStorage = await outerStorage.match(location.href, {ignoreSearch: true }).then(response => response && response.json());
+    // note(`Initial non-service-worker cache value: "${initialOuterStorage}", updated to: "${laterOuterStorage}".`);
 
-    const registration = await fetcher.ready;
-    if (registration.installing) {
-      console.log(`Service worker installing for scope ${registration.scope}.`);
-    } else if (registration.waiting) {
-      console.log(`Service worker installed for scope ${registration.scope}.`);
-    } else if (registration.active) {
-      console.log(`Service worker active for scope ${registration.scope}.`);
-    }
-
-    // Delayed addition of manifest.
-    const manifest = document.createElement('link');
-    manifest.setAttribute('rel', 'manifest');
-    manifest.setAttribute('href', new URL('manifest-test.json', location.href).href);
-    document.head.append(manifest);
+    // // Delayed addition of manifest.
+    // const manifest = document.createElement('link');
+    // manifest.setAttribute('rel', 'manifest');
+    // manifest.setAttribute('href', new URL('manifest-test.json', location.href).href);
+    // document.head.append(manifest);
   });
   function testOperations(label, opMaker, debug = false) {
     beforeAll(async function () {
@@ -49,10 +62,10 @@ describe("ResponseCache", function () {
     afterAll(async function () {
       cache.debug = false;
       let list = await opMaker('list', collection);
-      await Promise.all(list.map(request => false || opMaker('delete', request)));
+      await Promise.all(list.map(request => opMaker('delete', request)));
       const after = await opMaker('list', collection);
       expect(after).toEqual([]);
-      await opMaker('put', sticky, ResponseCache.version);
+      await opMaker('put', sticky, 'saved');
     });
     it("gets what is put there.", async function () {
       const response = await opMaker('get', item+'initial');
@@ -92,15 +105,64 @@ describe("ResponseCache", function () {
   describe('with string url request', function () {
     testOperations('string', (op, tag, data) => cache[op](tag, data));
   });
-  describe('by dispatch', function () {
-    testOperations('dispatch', async (op, tag, data) => {
-      const options = {method: (op === 'list') ? 'GET' : op.toUpperCase()};
-      if (data) options.body = JSON.stringify(data);
-      const response = await cache.dispatch(new Request(tag, options));
-      return response.json();
+  describe('performance', function () {
+    const length = 5e3,
+	  data = Array.from({length}, (_, i) => ({s: i.toString(), i: i})),
+	  tags = Array.from({length}, () => uuid4()),
+	  times = {};
+    let start;
+    function noteTime(op) {
+      let next = Date.now();
+      times[op] = next - start;
+      start = next;
+    }
+    function report(label, op, expected) {
+      it(`more than ${expected} ${op} ops/second.`, function () {
+	const time = times[op];
+	const actual = length * 1e3 / time;
+	console.log(`${label} ${Math.trunc(actual).toLocaleString()} ${op}s over ${time.toLocaleString()}ms.` );
+	expect(actual).toBeGreaterThan(expected);
+      });
+    }
+    describe('serial', function () {
+      beforeAll(async function () {
+	start = Date.now();
+	for (let index = 0; index < length; index++) {
+	  await cache.put(tags[index], data[index]);
+	}
+	noteTime('put');
+	await cache.list();
+	noteTime('list');
+	for (let index = 0; index < length; index++) {
+	  await cache.get(tags[index]);
+	}
+	noteTime('get');
+	for (let index = 0; index < length; index++) {
+	  await cache.delete(tags[index]);
+	}
+	noteTime('delete');
+      }, 30e3);
+      report('serial', 'get', 1000);
+      report('serial', 'put', 750);
+      report('serial', 'list', 4000);
+      report('serial', 'delete', 1000);
     });
-  });
-  describe('by fetch api', function () {
-    testOperations('service worker', (op, tag, data) => fetcher[op](tag, data));
+    describe('parallel', function () {
+      beforeAll(async function () {
+	start = Date.now();
+	await Promise.all(tags.map((tag, index) => cache.put(tag, data[index])));
+	noteTime('put');
+	await cache.list();
+	noteTime('list');
+	await Promise.all(tags.map(tag => cache.get(tag)));
+	noteTime('get');
+	await Promise.all(tags.map(tag => cache.delete(tag)));
+	noteTime('delete');
+      }, 30e3);
+      report('parallel', 'get', 1000);
+      report('parallel', 'put', 1000);
+      report('parallel', 'list', 6000);
+      report('parallel', 'delete', 1000);
+    });
   });
 });

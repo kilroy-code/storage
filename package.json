@@ -2,9 +2,17 @@
   "name": "@kilroy-code/storage",
   "version": "0.0.11",
   "description": "Key-value store for Web pages & PWAs, and their Express.js server.",
-  "main": "index.mjs",
+  "exports": "./index.mjs",
+  "imports": {
+    "#storage-local": {
+      "node": "./lib/storage-local-node.mjs",
+      "default": "./lib/storage-local-browser.mjs"
+    }
+  },
   "scripts": {
-    "test": "jasmine"
+    "test": "jasmine",
+    "build": "rollup -c",
+    "build-dev": "npx rollup -c --environment NODE_ENV:development"
   },
   "repository": {
     "type": "git",
@@ -28,6 +36,13 @@
   },
   "homepage": "https://github.com/kilroy-code/storage#readme",
   "devDependencies": {
-    "jasmine": "^5.7.1"
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-terser": "^0.4.4",
+    "jasmine": "^5.7.1",
+    "rollup": "^4.41.1",
+    "uuid4": "^2.0.3"
+  },
+  "dependencies": {
+    "@ki1r0y/cache": "^1.0.1"
   }
 }
