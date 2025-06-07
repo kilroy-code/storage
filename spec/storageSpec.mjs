@@ -108,7 +108,7 @@ describe("Storage", function () {
       it(`more than ${expected} ${op} ops/second.`, function () {
 	const time = times[op];
 	const actual = length * 1e3 / time;
-	console.log(`${label} ${Math.trunc(actual).toLocaleString()} ${op}s over ${time.toLocaleString()}ms.` );
+	console.log(`${label} ${Math.trunc(actual).toLocaleString()} ${op}s/s over ${time.toLocaleString()}ms.` );
 	expect(actual).toBeGreaterThan(expected);
       });
     }

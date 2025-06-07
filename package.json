@@ -1,8 +1,14 @@
 {
   "name": "@ki1r0y/storage",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Key-value store for Web pages & PWAs.",
-  "exports": "./index.mjs",
+  "exports": {
+    ".": {
+      "node": "./index.mjs",
+      "default": "./bundle.mjs"
+    },
+    "./spec.mjs": "./spec/storageSpec.mjs"
+  },
   "imports": {
     "#storage-local": {
       "node": "./lib/storage-local-node.mjs",
