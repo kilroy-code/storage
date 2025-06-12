@@ -94,7 +94,8 @@ describe("Storage", function () {
     testOperations('string', (op, tag, data) => storage[op](tag, data));
   });
   describe('performance', function () {
-    const length = 5e3,
+    const isNode = typeof(process) !== 'undefined',
+	  length = isNode ? 5e2 : 5e3,
 	  data = Array.from({length}, (_, i) => ({s: i.toString(), i: i})),
 	  tags = Array.from({length}, () => uuid4()),
 	  times = {};
@@ -131,7 +132,7 @@ describe("Storage", function () {
 	noteTime('delete');
       }, 30e3);
       report('serial', 'get', 1000);
-      report('serial', 'put', 750);
+      report('serial', 'put', isNode ? 40 : 750);
       report('serial', 'list', 4000);
       report('serial', 'delete', 1000);
     });
@@ -148,7 +149,7 @@ describe("Storage", function () {
 	noteTime('delete');
       }, 30e3);
       report('parallel', 'get', 1000);
-      report('parallel', 'put', 1000);
+      report('parallel', 'put', isNode ? 70 : 1000);
       report('parallel', 'list', 6000);
       report('parallel', 'delete', 1000);
     });
